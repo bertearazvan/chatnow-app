@@ -9,6 +9,8 @@ const {
   userLeave,
   getRoomUsers
 } = require("./utils/users");
+const helmet = require("helmet");
+var escape = require("escape-html");
 
 var debug = require("debug")("chatnow:server");
 
@@ -17,6 +19,9 @@ const server = http.createServer(app);
 const io = socketio(server);
 const botName = "ChatNow";
 
+// User helmet
+app.use(helmet());
+
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -24,7 +29,10 @@ app.use(express.static(path.join(__dirname, "public")));
 io.on("connection", socket => {
   console.log("New IO connection");
 
-  socket.on("joinRoom", ({ username, room }) => {
+  socket.on("joinRoom", ({
+    username,
+    room
+  }) => {
     const user = userJoin(socket.id, username, room);
 
     socket.join(user.room);
@@ -52,8 +60,9 @@ io.on("connection", socket => {
 
   //Listen for chatMessage
   socket.on("chatMessage", message => {
+    var html = escape(message);
     const user = getCurrentUser(socket.id);
-    io.to(user.room).emit("message", formatMessage(user.username, message));
+    io.to(user.room).emit("message", formatMessage(user.username, html));
   });
 
   // Runs when user disconnects
@@ -79,7 +88,7 @@ io.on("connection", socket => {
 // development error handler
 // will print stacktrace
 if (app.get("env") === "development") {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render("error", {
       message: err.message,
@@ -90,7 +99,7 @@ if (app.get("env") === "development") {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error", {
     message: err.message,
