@@ -33,7 +33,9 @@ io.on("connection", socket => {
     username,
     room
   }) => {
-    const user = userJoin(socket.id, username, room);
+    const escapedUsername = escape(username);
+    const escapedRoom = escape(room);
+    const user = userJoin(socket.id, escapedUsername, escapedRoom);
 
     socket.join(user.room);
     socket.emit("message", formatMessage(botName, "Welcome to ChatNow!"));
@@ -41,7 +43,7 @@ io.on("connection", socket => {
       .to(user.room)
       .emit(
         "message",
-        formatMessage(botName, `${username} has joined ${room} `)
+        formatMessage(botName, `${escapedUsername} has joined ${escapedRoom} `)
       );
 
     //Send users in room info
@@ -70,7 +72,7 @@ io.on("connection", socket => {
     const user = userLeave(socket.id);
     if (user) {
       // Emit to ALL the users
-      console.log(getRoomUsers(user.room));
+
       io.to(user.room).emit(
         "message",
         formatMessage(botName, `${user.username} has left the chat!`)

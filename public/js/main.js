@@ -29,7 +29,7 @@ socket.on("roomUsers", ({
 })
 
 socket.on("message", data => {
-    console.log(data);
+    // console.log(data);
     outputMessage(data);
 
     //Scroll down
