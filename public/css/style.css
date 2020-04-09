@@ -93,6 +93,10 @@ a {
 	overflow-y: scroll;
 }
 
+#typing-box {
+	padding: 10px;
+}
+
 .chat-messages .message {
 	padding: 10px;
 	margin-bottom: 15px;

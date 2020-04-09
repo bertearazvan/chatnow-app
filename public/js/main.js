@@ -2,7 +2,9 @@ const socket = io();
 const chatForm = document.getElementById("chat-form");
 const chatMessages = document.querySelector(".chat-messages");
 const roomName = document.getElementById("room-name");
-const userList = document.getElementById("users")
+const userList = document.getElementById("users");
+const messageInput = document.getElementById("msg");
+const typingElement = document.querySelector('#typing-box p');
 
 // Get username and room from URL using QS library
 const {
@@ -12,6 +14,43 @@ const {
     ignoreQueryPrefix: true
 })
 
+// create typing
+let typing = false;
+let timeout = undefined;
+
+const typingTimeout = () => {
+    typing = false;
+    socket.emit('typing', {
+        username: username,
+        typing: typing
+    })
+}
+
+messageInput.addEventListener("keypress", (e) => {
+    // console.log(e.target.value);
+    if (e.which !== 13) {
+        typing = true;
+        socket.emit('typing', {
+            username: username,
+            typing: typing
+        })
+        clearTimeout(timeout);
+        timeout = setTimeout(typingTimeout, 3000);
+    } else {
+        clearTimeout(timeout);
+        typingTimeout();
+    }
+})
+
+socket.on('displayTyping', data => {
+    if (data.typing == true) {
+        // console.log(data.username, "is typing...")
+        typingElement.innerText = data.username + " is typing..."
+    } else {
+        // console.log(data.username, "stopped typing")
+        typingElement.innerText = '';
+    }
+})
 
 // Join chatroom
 socket.emit("joinRoom", {
@@ -59,7 +98,7 @@ outputMessage = (data) => {
           <p class="text">
             ${data.text}
           </p>`;
-    document.querySelector(".chat-messages").appendChild(div);
+    document.querySelector(".chat-messages-container").appendChild(div);
 }
 
 //Output room name to DOM

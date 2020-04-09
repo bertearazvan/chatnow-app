@@ -60,6 +60,17 @@ io.on("connection", socket => {
 
   // Broadcast when user connects to all the users except the emitent user
 
+  // Listen for typing
+
+  socket.on('typing', data => {
+    const user = getCurrentUser(socket.id);
+    if (data.typing == true) {
+      socket.broadcast.to(user.room).emit('displayTyping', data);
+    } else {
+      socket.broadcast.to(user.room).emit('displayTyping', data);
+    }
+  })
+
   //Listen for chatMessage
   socket.on("chatMessage", message => {
     var html = escape(message);
@@ -129,7 +140,7 @@ function normalizePort(val) {
   return false;
 }
 
-const PORT = normalizePort(process.env.PORT || "8081");
+const PORT = normalizePort(process.env.PORT || "80");
 
 server.listen(PORT, err => {
   if (err) {
