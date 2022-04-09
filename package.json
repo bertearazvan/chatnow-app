@@ -13,7 +13,7 @@
     "escape-html": "^1.0.3",
     "express": "4.17.1",
     "helmet": "^3.22.0",
-    "moment": "2.24.0",
+    "moment": "2.29.2",
     "socket.io": "2.4.0"
   },
   "author": "",
